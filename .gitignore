@@ -29,6 +29,7 @@ backend/*.pyc
 # React config artifacts
 /frontend/.pnp
 /frontend/.pnp.js
+/frontend/package-lock.json
 
 # Misc
 .env.local
