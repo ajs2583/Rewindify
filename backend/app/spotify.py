@@ -37,7 +37,9 @@ def search_spotify_tracks(song_data, year):
     return uris
 
 
-def create_playlist(date, limit=100, access_token=None):
+def create_playlist(
+    date, limit=100, access_token=None, selected_indices=None, custom_name=None
+):
     if not access_token:
         return {"success": False, "message": "Missing access token"}
 
@@ -51,7 +53,8 @@ def create_playlist(date, limit=100, access_token=None):
     songs = scrape_chart(date, limit)
     if not songs:
         return {"success": False, "message": "No songs found"}
-
+    if selected_indices is not None:
+        songs = [songs[i] for i in selected_indices if 0 <= i < len(songs)]
     year = date.split("-")[0]
     uris = search_spotify_tracks(songs, year)
     if not uris:
@@ -59,7 +62,9 @@ def create_playlist(date, limit=100, access_token=None):
 
     try:
         playlist = sp.user_playlist_create(
-            user=user_id, name=f"Rewindify: Billboard {date}", public=False
+            user=user_id,
+            name=custom_name or f"Rewindify: Billboard {date}",
+            public=False,
         )
         sp.playlist_add_items(playlist_id=playlist["id"], items=uris)
         return {"success": True, "playlist_url": playlist["external_urls"]["spotify"]}

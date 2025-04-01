@@ -7,11 +7,12 @@ export default function Home() {
 	const [loading, setLoading] = useState(false);
 	const [playlistUrl, setPlaylistUrl] = useState(null);
 	const [accessToken, setAccessToken] = useState(null);
+	const [playlistTitle, setPlaylistTitle] = useState("");
+	const [selectedSongs, setSelectedSongs] = useState([]);
 
 	const isReady = date && trackCount;
 
 	useEffect(() => {
-		// Handle redirect back from Spotify auth
 		const hash = window.location.hash;
 		if (hash) {
 			const tokenMatch = hash.match(/access_token=([^&]*)/);
@@ -29,37 +30,6 @@ export default function Home() {
 		}
 	}, []);
 
-	// ✅ This is where handleCreatePlaylist goes
-	const handleCreatePlaylist = async () => {
-		if (!accessToken) return alert("Please log into Spotify first.");
-
-		try {
-			const res = await fetch("/api/create-playlist", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					date: date,
-					track_limit: trackCount,
-					access_token: accessToken, // ✨ pass token!
-				}),
-			});
-			const data = await res.json();
-
-			if (data.success) {
-				setPlaylistUrl(data.playlist_url);
-			} else {
-				alert(data.message || "Failed to create playlist.");
-			}
-		} catch (err) {
-			console.error(err);
-			alert("Error creating playlist.");
-		}
-	};
-
-	// ...your return JSX goes here...
-
 	const handleGenerate = async () => {
 		setLoading(true);
 		setSongs([]);
@@ -67,13 +37,13 @@ export default function Home() {
 		try {
 			const url = `${process.env.REACT_APP_API_URL}/api/scrape?date=${date}&limit=${trackCount}`;
 			const res = await fetch(url);
-
 			if (!res.ok) throw new Error("API returned non-200 status");
 
 			const data = await res.json();
-
 			if (data.success) {
 				setSongs(data.songs);
+				setSelectedSongs(data.songs.map((_, idx) => idx)); // default all selected
+				setPlaylistTitle(`Rewindify: Billboard ${date}`);
 			} else {
 				alert(data.message || "Something went wrong.");
 			}
@@ -82,6 +52,40 @@ export default function Home() {
 			alert("Failed to fetch songs.");
 		} finally {
 			setLoading(false);
+		}
+	};
+
+	const handleCreatePlaylist = async () => {
+		if (!accessToken) return alert("Please log into Spotify first.");
+
+		try {
+			const res = await fetch("/api/create-playlist", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					date,
+					track_limit: trackCount,
+					access_token: accessToken,
+					selected_indices: selectedSongs,
+					custom_name:
+						playlistTitle.trim() === ""
+							? `Rewindify: Billboard ${date}`
+							: playlistTitle,
+				}),
+			});
+
+			const data = await res.json();
+
+			console.log("Create Playlist Response:", data); // 🧠 Log server response
+
+			if (data.success) {
+				setPlaylistUrl(data.playlist_url);
+			} else {
+				alert(data.message || "Failed to create playlist.");
+			}
+		} catch (err) {
+			console.error("Playlist creation error:", err); // 🧠 Log error
+			alert("Error creating playlist.");
 		}
 	};
 
@@ -102,9 +106,6 @@ export default function Home() {
 						className="input-field"
 						max={new Date().toISOString().split("T")[0]}
 					/>
-					{date && new Date(date) > new Date() && (
-						<p className="validation-warning">Date cannot be in the future.</p>
-					)}
 
 					<input
 						type="number"
@@ -115,8 +116,15 @@ export default function Home() {
 						min="1"
 						max="100"
 					/>
-					{trackCount > 100 && (
-						<p className="validation-warning">Track count cannot exceed 100.</p>
+
+					{songs.length > 0 && (
+						<input
+							type="text"
+							className="input-field"
+							placeholder="Playlist Title"
+							value={playlistTitle}
+							onChange={(e) => setPlaylistTitle(e.target.value)}
+						/>
 					)}
 
 					{!accessToken && (
@@ -154,12 +162,14 @@ export default function Home() {
 					)}
 				</div>
 			</header>
+
 			{songs.length > 0 && (
 				<div className="song-table-wrapper">
 					<table className="song-table">
 						<thead>
 							<tr>
 								<th>#</th>
+								<th>Include?</th>
 								<th>Preview</th>
 								<th>Title</th>
 								<th>Artist</th>
@@ -177,9 +187,19 @@ export default function Home() {
 									<tr key={idx}>
 										<td>{idx + 1}</td>
 										<td>
-											{/* You can add an album cover or preview icon here */}
-											🎵
+											<input
+												type="checkbox"
+												checked={selectedSongs.includes(idx)}
+												onChange={() =>
+													setSelectedSongs((prev) =>
+														prev.includes(idx)
+															? prev.filter((i) => i !== idx)
+															: [...prev, idx]
+													)
+												}
+											/>
 										</td>
+										<td>🎵</td>
 										<td>{song.title}</td>
 										<td>{song.artist}</td>
 										<td>
@@ -199,7 +219,6 @@ export default function Home() {
 					</table>
 				</div>
 			)}
-
 			<footer className="about-footer">
 				<div>
 					Made by{" "}

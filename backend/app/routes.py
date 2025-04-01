@@ -27,5 +27,9 @@ def create_spotify_playlist():
             {"success": False, "message": "Date and access token required"}
         ), 400
 
-    result = create_playlist(date, limit, access_token)
+    custom_name = data.get("custom_name")
+    selected_indices = data.get("selected_indices", list(range(limit)))
+
+    result = create_playlist(date, limit, access_token, selected_indices, custom_name)
+
     return jsonify(result)
