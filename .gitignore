@@ -23,7 +23,7 @@ yarn-error.log*
 
 # Python
 backend/venv/
-backend/__pycache__/
+backend/app/__pycache__/
 backend/*.pyc
 
 # React config artifacts
