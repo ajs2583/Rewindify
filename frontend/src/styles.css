@@ -47,6 +47,22 @@ body {
 	color: #ffffff;
 }
 
+.logout-button {
+	background-color: #ff3b30;
+	color: white;
+	font-weight: bold;
+	border-radius: 5px;
+	padding: 8px 15px;
+	cursor: pointer;
+	border: none;
+	font-family: "Inter", sans-serif;
+	transition: background-color 0.3s ease;
+}
+
+.logout-button:hover {
+	background-color: #cc2920;
+}
+
 .logo h3 {
 	color: white;
 	margin: 0;
@@ -318,4 +334,20 @@ input[type="number"]::-webkit-inner-spin-button {
 		padding: 10px 12px;
 		font-size: 13px;
 	}
+}
+
+.styled-subtitle {
+	font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+	color: #444;
+	font-weight: 500;
+	line-height: 1.5;
+	text-align: center;
+	margin-top: 15px;
+}
+
+.subtitle-detail {
+	display: block;
+	margin-top: 8px;
+	font-size: 0.95em;
+	color: #666;
 }

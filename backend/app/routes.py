@@ -21,6 +21,7 @@ def create_spotify_playlist():
     date = data.get("date")
     limit = int(data.get("track_limit", 100))
     access_token = data.get("access_token")
+    print(f"Creating playlist with: {date}, {limit}, token: {bool(access_token)}")
 
     if not date or not access_token:
         return jsonify(
