@@ -93,9 +93,12 @@ export default function Home() {
 		<div className="page home-page">
 			<header className="home-header">
 				<h1 className="home-title">Welcome to Rewindify</h1>
-				<p className="home-subtitle">
-					Generate a Spotify playlist based on the Billboard chart from any date
-					you choose.
+				<p className="home-subtitle styled-subtitle">
+					Turn back time and relive the hits!
+					<br />
+					<span className="subtitle-detail">
+						Generate a Spotify playlist based on any Billboard chart date
+					</span>
 				</p>
 
 				<div className="input-section">
