@@ -32,19 +32,21 @@
 }
 
 .logout-button {
-	background-color: #ff3b30;
+	background-color: #0f9ee0;
 	color: white;
-	font-weight: bold;
 	border-radius: 5px;
 	padding: 8px 15px;
 	cursor: pointer;
 	border: none;
+	text-decoration: none;
 	font-family: "Inter", sans-serif;
-	transition: background-color 0.3s ease;
+	transition: background-color 0.3s ease, color 0.3s ease;
+	font-weight: bold;
 }
 
 .logout-button:hover {
-	background-color: #cc2920;
+	background-color: #ff3b30;
+	color: #ffffff;
 }
 
 .logo h3 {
