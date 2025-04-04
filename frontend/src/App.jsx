@@ -3,7 +3,7 @@ import About from "./pages/About";
 import Home from "./pages/Home";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Contact from "./pages/Contact";
-import "./styles.css";
+import "./styles/main.css";
 import Navbar from "./components/Navbar";
 
 function App() {

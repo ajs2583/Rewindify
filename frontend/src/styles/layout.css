@@ -1,0 +1,24 @@
+/* --------------------
+   Home Page Layout → layout.css
+-------------------- */
+.home-page {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	padding: 60px 20px;
+}
+
+.home-header {
+	max-width: 800px;
+	margin: 0 auto;
+	text-align: center;
+}
+
+.home-title {
+	font-size: clamp(2rem, 5vw, 3rem);
+	color: #ff5733;
+	margin-bottom: 20px;
+	text-align: center;
+}
