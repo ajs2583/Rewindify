@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rewindify</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='rewindify-logo.svg') }}" alt="Rewindify Logo" style="height:40px">
+        </div>
+        <div class="nav-links">
+            <a href="{{ url_for('web.home') }}" class="nav-button">Home</a>
+            <a href="{{ url_for('web.about') }}" class="nav-button">About</a>
+            <a href="{{ url_for('web.privacy_policy') }}" class="nav-button">Privacy Policy</a>
+            <a href="{{ url_for('web.contact') }}" class="nav-button">Contact</a>
+            <button id="logout-btn" class="logout-button" style="display:none">Log out</button>
+        </div>
+    </nav>
+    {% block content %}{% endblock %}
+    <script>
+        const SPOTIFY_ID = "{{ spotify_client_id }}";
+    </script>
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+</body>
+</html>

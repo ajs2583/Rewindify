@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page home-page">
+    <header class="home-header">
+        <h1 class="home-title">Welcome to Rewindify</h1>
+        <p class="home-subtitle styled-subtitle">
+            Turn back time and relive the hits!<br>
+            <span class="subtitle-detail">Generate a Spotify playlist based on any Billboard chart date</span>
+        </p>
+        <div class="input-section">
+            <input type="date" id="date-input" class="input-field" max="{{ current_date }}">
+            <input type="number" id="track-count-input" class="input-field" placeholder="Number of tracks" min="1" max="100">
+            <div class="validation-warning" id="track-warning" style="display:none;">Track count must be 100 or less.</div>
+            <input type="text" id="playlist-title" class="input-field" placeholder="Playlist Title" style="display:none;">
+            <a href="#" id="spotify-login" class="spotify-login-button" style="display:none;">Log in with Spotify</a>
+            <button id="generate-btn" class="generate-button" disabled>Generate</button>
+            <button id="create-playlist-btn" class="spotify-button" style="display:none;">Create Spotify Playlist</button>
+            <div id="playlist-success" class="playlist-success" style="display:none;"></div>
+        </div>
+    </header>
+    <div id="song-table-container"></div>
+    <footer class="about-footer">
+        <div>
+            Made by <a class="about-footer-link" href="https://github.com/ajs2583">Andrew Sliva</a>
+        </div>
+        <div class="footer-links">
+            <a class="about-footer-link" href="{{ url_for('web.home') }}">Home</a> |
+            <a class="about-footer-link" href="{{ url_for('web.about') }}">About</a> |
+            <a class="about-footer-link" href="{{ url_for('web.privacy_policy') }}">Privacy Policy</a> |
+            <a class="about-footer-link" href="{{ url_for('web.contact') }}">Contact</a>
+        </div>
+    </footer>
+</div>
+{% endblock %}
