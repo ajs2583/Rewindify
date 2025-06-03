@@ -11,7 +11,7 @@ api = Blueprint("api", __name__)
 def scrape_billboard_data():
     date = request.args.get("date")
     limit = int(request.args.get("limit", 100))
-    # TODO FIGURE OUT WHAT THIS DOES
+    # Parse ?enrich=true to include Spotify links
     enrich = request.args.get("enrich", "false").lower() == "true"
     if not date:
         return jsonify({"success": False, "message": "Date is required"}), 400
