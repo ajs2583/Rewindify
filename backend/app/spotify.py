@@ -19,8 +19,8 @@ sp = spotipy.Spotify(
 )
 
 
-def search_spotify_tracks(song_data, year, return_urls=False):
-    results_list = []
+def search_spotify_tracks(song_data, year):
+    uris = []
     for item in song_data:
         title = item["title"]
         artist = item["artist"]
@@ -29,23 +29,24 @@ def search_spotify_tracks(song_data, year, return_urls=False):
             results = sp.search(q=query, type="track", limit=1)
             items = results.get("tracks", {}).get("items")
             if items:
-                track = items[0]
-                if return_urls:
-                    results_list.append(
-                        {
-                            "track_url": track["external_urls"].get("spotify"),
-                            "artist_url": track["artists"][0]["external_urls"].get(
-                                "spotify"
-                            ),
-                        }
-                    )
-                else:
-                    results_list.append(track["uri"])
+                uris.append(items[0]["uri"])
+                # track = items[0]
+                # if return_urls:
+                #     results_list.append(
+                #         {
+                #             "track_url": track["external_urls"].get("spotify"),
+                #             "artist_url": track["artists"][0]["external_urls"].get(
+                #                 "spotify"
+                #             ),
+                #         }
+                #     )
+                # else:
+                #     results_list.append(track["uri"])
             else:
                 logging.info(f"Not found: {title} by {artist}")
         except Exception as e:
             logging.error(f"Search error for {title} by {artist}: {e}")
-    return results_list
+    return uris
 
 
 def create_playlist(

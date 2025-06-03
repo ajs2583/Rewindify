@@ -19,10 +19,10 @@ def scrape_billboard_data():
     songs = scrape_chart(date, limit)
     if not songs:
         return jsonify({"success": False, "message": "No songs found"}), 404
-    
+
     if enrich:
         year = date.split("-")[0]
-        enriched = search_spotify_tracks(songs, year, return_urls=True)
+        enriched = search_spotify_tracks(songs, year)
 
         # Combine original + enriched
         combined = []
