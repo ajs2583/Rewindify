@@ -22,7 +22,7 @@ def scrape_billboard_data():
     
     if enrich:
         year = date.split("-")[0]
-        enriched = search_spotify_tracks(songs, year)
+        enriched = search_spotify_tracks(songs, year, return_urls=True)
 
         # Combine original + enriched
         combined = []
