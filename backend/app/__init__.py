@@ -7,7 +7,9 @@ def create_app():
     CORS(app)
 
     from .routes import api
+    from .views import web
 
-    app.register_blueprint(api)
+    app.register_blueprint(web)
+    app.register_blueprint(api, url_prefix='/api')
 
     return app
