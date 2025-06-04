@@ -1,0 +1,55 @@
+/* --------------------
+   Navbar → navbar.css
+-------------------- */
+.navbar {
+	background-color: #ff5733;
+	padding: 10px 20px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.nav-links {
+	display: flex;
+	gap: 10px;
+}
+
+.nav-button {
+	background-color: #ffe8e0;
+	color: #ff5733;
+	border: none;
+	padding: 8px 15px;
+	border-radius: 5px;
+	cursor: pointer;
+	text-decoration: none;
+	transition: background-color 0.3s ease, color 0.3s ease;
+	font-weight: bold;
+}
+
+.nav-button:hover {
+	background-color: #cc4520;
+	color: #ffffff;
+}
+
+.logout-button {
+	background-color: #0f9ee0;
+	color: white;
+	border-radius: 5px;
+	padding: 8px 15px;
+	cursor: pointer;
+	border: none;
+	text-decoration: none;
+	font-family: "Inter", sans-serif;
+	transition: background-color 0.3s ease, color 0.3s ease;
+	font-weight: bold;
+}
+
+.logout-button:hover {
+	background-color: #ff3b30;
+	color: #ffffff;
+}
+
+.logo h3 {
+	color: white;
+	margin: 0;
+}
