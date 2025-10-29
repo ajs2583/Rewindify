@@ -2,6 +2,10 @@
 import requests
 from bs4 import BeautifulSoup
 import logging
+import urllib3
+
+# Disable SSL warnings
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 def construct_url(date):
@@ -12,7 +16,7 @@ def scrape_chart(date, limit=100):
     url = construct_url(date)
     headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
     try:
-        response = requests.get(url, headers=headers)
+        response = requests.get(url, headers=headers, verify=False)
         response.raise_for_status()
     except requests.exceptions.RequestException as e:
         logging.error(f"Error fetching Billboard chart: {e}")
