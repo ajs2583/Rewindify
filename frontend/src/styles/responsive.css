@@ -59,11 +59,6 @@
 		font-size: 0.9rem;
 	}
 
-	.content-grid {
-		grid-template-columns: 1fr;
-		gap: 30px;
-	}
-
 	.form-section,
 	.charts-section {
 		padding: 25px;
@@ -71,7 +66,12 @@
 
 	.songs-section {
 		padding: 25px;
+		margin-top: 0;
+	}
+
+	.charts-section-secondary {
 		margin-top: 30px;
+		padding: 18px 20px;
 	}
 }
 
@@ -209,10 +209,6 @@
 		padding: 20px 10px;
 	}
 
-	.content-grid {
-		gap: 20px;
-	}
-
 	.form-section,
 	.charts-section {
 		padding: 20px;
@@ -221,8 +217,13 @@
 
 	.songs-section {
 		padding: 20px;
-		margin-top: 20px;
+		margin-top: 0;
 		border-radius: 10px;
+	}
+
+	.charts-section-secondary {
+		margin-top: 20px;
+		padding: 16px 18px;
 	}
 
 	/* Recent charts mobile */

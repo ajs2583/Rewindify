@@ -25,6 +25,8 @@ yarn-error.log*
 backend/venv/
 backend/app/__pycache__/
 backend/*.pyc
+backend/chart_cache.db
+backend/static_ui/
 
 # React config artifacts
 /frontend/.pnp

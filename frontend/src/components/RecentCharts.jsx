@@ -39,7 +39,7 @@ const RecentCharts = memo(({ onDateSelect }) => {
 	if (loading) {
 		return (
 			<div className="recent-charts">
-				<h3>🔥 Popular Charts</h3>
+				<h3>Try these dates</h3>
 				<div className="charts-loading">Loading popular dates...</div>
 			</div>
 		);
@@ -48,9 +48,9 @@ const RecentCharts = memo(({ onDateSelect }) => {
 	if (charts.length === 0) {
 		return (
 			<div className="recent-charts">
-				<h3>🔥 Popular Charts</h3>
+				<h3>Try these dates</h3>
 				<div className="charts-empty">
-					<p>No popular charts yet. Be the first to explore!</p>
+					<p>No popular charts yet. Look up a date above to get started.</p>
 				</div>
 			</div>
 		);
@@ -58,7 +58,7 @@ const RecentCharts = memo(({ onDateSelect }) => {
 
 	return (
 		<div className="recent-charts">
-			<h3>🔥 Popular Charts</h3>
+			<h3>Try these dates</h3>
 			<div className="charts-grid">
 				{charts.map((chart, index) => (
 					<div

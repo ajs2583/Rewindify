@@ -1,5 +1,5 @@
 // pages/Home.jsx
-import { useState } from "react";
+import { useState, useRef } from "react";
 import useSpotifyToken from "../hooks/useSpotifyToken";
 import { fetchSongs, createPlaylist } from "../api/playlist";
 import SongTable from "../components/SongTable";
@@ -17,14 +17,44 @@ export default function Home() {
 	const [playlistUrl, setPlaylistUrl] = useState(null);
 	const [playlistTitle, setPlaylistTitle] = useState("");
 	const [selectedSongs, setSelectedSongs] = useState([]);
+	const fetchAbortRef = useRef(null);
 	const { token: accessToken, isLoading: tokenLoading } = useSpotifyToken();
 
 	const handleDateSelect = (selectedDate) => {
 		setDate(selectedDate);
-		// Scroll to form
+		setTrackCount((prev) => (prev === "" ? "100" : prev));
 		document.querySelector(".playlist-form-container")?.scrollIntoView({
 			behavior: "smooth",
 		});
+		// Auto-fetch songs for this date
+		if (fetchAbortRef.current) fetchAbortRef.current.abort();
+		setLoading(true);
+		setSongs([]);
+		setPlaylistUrl(null);
+		setShowConfetti(false);
+		setPlaylistTitle("");
+		const controller = new AbortController();
+		fetchAbortRef.current = controller;
+		fetchSongs(selectedDate, "100", controller.signal)
+			.then((data) => {
+				if (controller.signal.aborted) return;
+				if (data && data.success && Array.isArray(data.songs)) {
+					setSongs(data.songs);
+					setSelectedSongs(data.songs.map((_, idx) => idx));
+					setPlaylistTitle(`Rewindify: Billboard ${selectedDate}`);
+				} else {
+					alert(data?.message || "No songs found for this date.");
+				}
+			})
+			.catch((err) => {
+				if (err.name === "AbortError") return;
+				console.error("Fetch error:", err);
+				alert("Failed to fetch songs. Is the backend running on port 5000?");
+			})
+			.finally(() => {
+				if (!controller.signal.aborted) setLoading(false);
+				if (fetchAbortRef.current === controller) fetchAbortRef.current = null;
+			});
 	};
 
 	const handleGenerate = async () => {
@@ -100,10 +130,10 @@ export default function Home() {
 						<span className="title-brand">Rewindify</span>
 					</h1>
 					<p className="home-subtitle styled-subtitle">
-						Turn back time and relive the hits! 🎵
+						Pick a date, get the Billboard chart, create a Spotify playlist.
 						<br />
 						<span className="subtitle-detail">
-							Generate a Spotify playlist based on any Billboard chart date
+							Look up any Hot 100 chart and build your playlist in seconds.
 						</span>
 					</p>
 
@@ -125,7 +155,7 @@ export default function Home() {
 			</div>
 
 			<div className="home-content">
-				<div className="content-grid">
+				<div className="lookup-main">
 					<div className="form-section">
 						<div className="playlist-form-container">
 							<PlaylistForm
@@ -147,27 +177,27 @@ export default function Home() {
 						</div>
 					</div>
 
-					<div className="charts-section">
-						<RecentCharts onDateSelect={handleDateSelect} />
-					</div>
+					{songs.length > 0 && (
+						<div className="songs-section">
+							<SongTable
+								songs={songs}
+								accessToken={accessToken}
+								selectedSongs={selectedSongs}
+								toggleSelect={(idx) =>
+									setSelectedSongs((prev) =>
+										prev.includes(idx)
+											? prev.filter((i) => i !== idx)
+											: [...prev, idx]
+									)
+								}
+							/>
+						</div>
+					)}
 				</div>
 
-				{songs.length > 0 && (
-					<div className="songs-section">
-						<SongTable
-							songs={songs}
-							accessToken={accessToken}
-							selectedSongs={selectedSongs}
-							toggleSelect={(idx) =>
-								setSelectedSongs((prev) =>
-									prev.includes(idx)
-										? prev.filter((i) => i !== idx)
-										: [...prev, idx]
-								)
-							}
-						/>
-					</div>
-				)}
+				<div className="charts-section charts-section-secondary">
+					<RecentCharts onDateSelect={handleDateSelect} />
+				</div>
 			</div>
 
 			<footer className="about-footer">

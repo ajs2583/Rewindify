@@ -1,19 +1,22 @@
-from flask import Blueprint, request, jsonify
-from .spotify import create_playlist
-from .billboard import scrape_chart
-from .spotify import search_spotify_tracks
 import json
+import os
+
+from flask import Blueprint, request, jsonify
+
+from .chart_service import get_chart
+from .spotify import create_playlist, search_spotify_tracks
 
 api = Blueprint("api", __name__)
 
-# File to store recent charts data
-RECENT_CHARTS_FILE = "recent_charts.json"
+# Path to recent charts file (backend dir, so it works regardless of cwd)
+_backend_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+RECENT_CHARTS_FILE = os.path.join(_backend_dir, "recent_charts.json")
 
 
 def load_recent_charts():
     """Load recent charts data from file"""
     try:
-        with open(RECENT_CHARTS_FILE, "r") as f:
+        with open(RECENT_CHARTS_FILE, "r", encoding="utf-8") as f:
             return json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
         return {}
@@ -22,7 +25,7 @@ def load_recent_charts():
 def save_recent_charts(data):
     """Save recent charts data to file"""
     try:
-        with open(RECENT_CHARTS_FILE, "w") as f:
+        with open(RECENT_CHARTS_FILE, "w", encoding="utf-8") as f:
             json.dump(data, f)
     except (IOError, OSError):
         pass
@@ -44,10 +47,21 @@ def update_recent_charts(date):
     return charts
 
 
+def _parse_limit(value, default=100):
+    """Parse limit from query/body; return default if missing or invalid."""
+    if value is None or value == "":
+        return default
+    try:
+        n = int(value)
+        return max(1, min(100, n)) if n else default
+    except (ValueError, TypeError):
+        return default
+
+
 @api.route("/scrape", methods=["GET"])
 def scrape_billboard_data():
     date = request.args.get("date")
-    limit = int(request.args.get("limit", 100))
+    limit = _parse_limit(request.args.get("limit"))
     # Parse ?enrich=true to include Spotify links
     enrich = request.args.get("enrich", "false").lower() == "true"
     if not date:
@@ -56,7 +70,7 @@ def scrape_billboard_data():
     # Update recent charts with this date
     update_recent_charts(date)
 
-    songs = scrape_chart(date, limit)
+    songs = get_chart(date, limit)
     if not songs:
         return jsonify({"success": False, "message": "No songs found"}), 404
 
@@ -117,7 +131,7 @@ def test_spotify_auth():
 def create_spotify_playlist():
     data = request.get_json()
     date = data.get("date")
-    limit = int(data.get("track_limit", 100))
+    limit = _parse_limit(data.get("track_limit"))
     access_token = data.get("access_token")
     print(f"Creating playlist with: {date}, {limit}, token: {bool(access_token)}")
     if access_token:
@@ -131,6 +145,17 @@ def create_spotify_playlist():
     custom_name = data.get("custom_name")
     selected_indices = data.get("selected_indices", list(range(limit)))
 
-    result = create_playlist(date, limit, access_token, selected_indices, custom_name)
+    songs = get_chart(date, limit)
+    if not songs:
+        return jsonify({"success": False, "message": "No songs found"}), 404
+
+    result = create_playlist(
+        date=date,
+        limit=limit,
+        access_token=access_token,
+        selected_indices=selected_indices,
+        custom_name=custom_name,
+        songs=songs,
+    )
 
     return jsonify(result)

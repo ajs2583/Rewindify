@@ -24,7 +24,9 @@ export default function PlaylistForm({
 		Number(trackCount) <= 100 &&
 		Number(trackCount) >= 1 &&
 		new Date(date) <= new Date();
-	const redirectUri = "http://localhost:3000";
+	const redirectUri =
+		process.env.REACT_APP_REDIRECT_URI ||
+		(typeof window !== "undefined" ? window.location.origin : "http://localhost:3000");
 	return (
 		<div className="input-section">
 			<input

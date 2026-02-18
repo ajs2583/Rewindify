@@ -3,7 +3,6 @@ import logging
 from dotenv import load_dotenv
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
-from .billboard import scrape_chart
 import urllib3
 import requests
 from requests.adapters import HTTPAdapter
@@ -69,7 +68,12 @@ def search_spotify_tracks(song_data, year, spotify_client=None):
 
 
 def create_playlist(
-    date, limit=100, access_token=None, selected_indices=None, custom_name=None
+    date,
+    limit=100,
+    access_token=None,
+    selected_indices=None,
+    custom_name=None,
+    songs=None,
 ):
     if not access_token:
         return {"success": False, "message": "Missing access token"}
@@ -110,7 +114,8 @@ def create_playlist(
 
         return {"success": False, "message": "Authentication failed"}
 
-    songs = scrape_chart(date, limit)
+    if songs is None:
+        return {"success": False, "message": "Songs list is required"}
     if not songs:
         return {"success": False, "message": "No songs found"}
     if selected_indices is not None:
