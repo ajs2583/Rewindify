@@ -2,8 +2,10 @@ import json
 import os
 
 from flask import Blueprint, request, jsonify
+from sqlalchemy import text
 
 from .chart_service import get_chart
+from .models import db
 from .spotify import create_playlist, search_spotify_tracks
 
 api = Blueprint("api", __name__)
@@ -56,6 +58,16 @@ def _parse_limit(value, default=100):
         return max(1, min(100, n)) if n else default
     except (ValueError, TypeError):
         return default
+
+
+@api.route("/health", methods=["GET"])
+def health():
+    """Health check for deployment/load balancers. Returns 200 and verifies DB connectivity."""
+    try:
+        db.session.execute(text("SELECT 1"))
+        return jsonify({"status": "ok", "database": "ok"}), 200
+    except Exception as e:
+        return jsonify({"status": "error", "database": str(e)}), 503
 
 
 @api.route("/scrape", methods=["GET"])
@@ -113,14 +125,14 @@ def test_spotify_auth():
 
     try:
         import spotipy
-        import os
-        import requests
 
-        # Create a custom session that handles SSL properly
-        session = requests.Session()
-        session.verify = False  # Disable SSL verification
+        from .http_utils import get_requests_session_for_outbound
 
-        sp = spotipy.Spotify(auth=access_token)
+        session = get_requests_session_for_outbound()
+        kwargs = {}
+        if session is not None:
+            kwargs["requests_session"] = session
+        sp = spotipy.Spotify(auth=access_token, **kwargs)
         user = sp.current_user()
         return jsonify({"success": True, "user": user})
     except Exception as e:

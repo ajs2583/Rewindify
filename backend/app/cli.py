@@ -38,11 +38,16 @@ def init_cli(app):
             if last_sat not in dates:
                 dates.insert(0, last_sat)
             date_strs = [d.strftime("%Y-%m-%d") for d in dates]
+            failed = 0
             for i, date_str in enumerate(date_strs):
-                refresh_chart(date_str, 100)
+                n = refresh_chart(date_str, 100)
+                if n == 0:
+                    failed += 1
                 if i < len(date_strs) - 1:
                     time.sleep(1.5)
-            print(f"Refreshed {len(date_strs)} chart(s)")
+            print(f"Refreshed {len(date_strs)} chart(s)" + (f", {failed} failed" if failed else ""))
+            if failed:
+                raise SystemExit(1)
 
     @app.cli.command("scrape-now")
     @click.option(

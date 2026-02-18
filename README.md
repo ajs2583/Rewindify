@@ -137,6 +137,7 @@ npm start
 
 The backend provides the following API endpoints:
 
+- `GET /api/health` - Health check (returns 200 and verifies DB); use for deployment/load balancers
 - `GET /api/scrape?date=YYYY-MM-DD&limit=100&enrich=true` - Scrape Billboard chart data
 - `GET /api/recent-charts` - Get most popular chart dates
 - `POST /api/test-auth` - Test Spotify authentication
@@ -147,7 +148,7 @@ The backend provides the following API endpoints:
 ### Backend Issues
 
 - **Port 5000 already in use**: Change the port in `backend/run.py` or stop the process using port 5000
-- **SSL Certificate errors**: The code includes SSL verification bypasses, but if issues persist, check your Python SSL configuration
+- **SSL Certificate errors**: Outbound requests use full SSL verification by default. In production, never disable it. For local development behind a corporate proxy, you can set `DISABLE_SSL_VERIFY=1` only when `FLASK_ENV=development` (see `backend/.env.example`). Otherwise, fix certificate issues with proper system/CA configuration (e.g. install your proxy’s CA bundle).
 - **Module not found errors**: Ensure all dependencies are installed in your virtual environment
 
 ### Frontend Issues
@@ -165,9 +166,15 @@ The backend provides the following API endpoints:
 
 ### Config vars (Heroku)
 
-- **DATABASE_URL** – Set automatically when you add Heroku Postgres.
+- **DATABASE_URL** – Set automatically when you add Heroku Postgres. Production must set this; sqlite is for local dev only.
 - **PORT** – Set automatically by Heroku.
 - **CLIENT_ID**, **CLIENT_SECRET**, **REDIRECT_URI** – Your Spotify app credentials. Set **REDIRECT_URI** to your production URL (e.g. `https://yourapp.herokuapp.com`) and add that URL to your Spotify app’s redirect URIs in the Spotify Developer Dashboard.
+
+Do **not** set `DISABLE_SSL_VERIFY` in production; outbound HTTPS uses full certificate verification.
+
+### Runtime behavior
+
+The **Procfile** runs `gunicorn -b 0.0.0.0:$PORT run:app`. When the `backend/static_ui/` directory is present (React build), the app serves the SPA from `/` and the API from `/api`. All `/api` routes take precedence; the SPA is served for other paths so the same app can be used for both API and UI.
 
 ### Single-app deploy (backend serves frontend)
 
@@ -184,9 +191,15 @@ Deploy the backend to Heroku as above (without `static_ui`). Deploy the frontend
 
 Add the frontend URL as a redirect URI in your Spotify app.
 
+### Playlist creation and SSL
+
+The `POST /api/create-playlist` request/response contract is unchanged. Playlist creation in production uses full SSL verification when talking to Spotify. Do not set `DISABLE_SSL_VERIFY` in production. If you see SSL/certificate errors, fix system or CA configuration rather than disabling verification.
+
+**After deployment, verify playlist creation:** log in with Spotify, pick a chart date, generate the playlist, create it, and open the returned playlist link in Spotify to confirm it was created and contains tracks.
+
 ## Daily chart refresh (Heroku Scheduler)
 
-Chart data is cached in the database. To keep it fresh (e.g. if Billboard changes the site), run a daily scrape:
+Chart data is cached in the database. Production must set **DATABASE_URL** (e.g. Heroku Postgres); sqlite is for local dev only. To keep caches fresh (e.g. if Billboard changes the site), run a daily scrape. The job is idempotent and safe to run daily.
 
 1. Add the **Heroku Scheduler** add-on to your app.
 2. In Scheduler, add a job that runs **daily** with:
@@ -194,7 +207,7 @@ Chart data is cached in the database. To keep it fresh (e.g. if Billboard change
    cd backend && flask scrape-daily
    ```
    (Ensure the app’s run directory is the project root so `backend` exists, or run `flask scrape-daily` from the `backend` directory if that is the app root.)
-3. The command refreshes up to 50 cached chart dates (oldest first) plus the current chart week.
+3. The command refreshes up to 50 cached chart dates (oldest first) plus the current chart week. It exits with a non-zero code if any date failed so you can alert on job failure.
 
 ## Development
 

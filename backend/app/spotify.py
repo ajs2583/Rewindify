@@ -3,25 +3,10 @@ import logging
 from dotenv import load_dotenv
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
-import urllib3
-import requests
-from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
 
-# Disable SSL warnings
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
-# Monkey patch requests to disable SSL verification globally
-import ssl
-
-ssl._create_default_https_context = ssl._create_unverified_context
+from .http_utils import get_requests_session_for_outbound
 
 load_dotenv()
-
-# Set SSL environment variables globally to handle certificate issues
-os.environ["REQUESTS_CA_BUNDLE"] = ""
-os.environ["CURL_CA_BUNDLE"] = ""
-os.environ["SSL_VERIFY"] = "false"
 
 # Global Spotify client - will be created when needed
 sp = None
@@ -30,6 +15,10 @@ sp = None
 def get_global_spotify_client():
     global sp
     if sp is None:
+        session = get_requests_session_for_outbound()
+        kwargs = {}
+        if session is not None:
+            kwargs["requests_session"] = session
         sp = spotipy.Spotify(
             auth_manager=SpotifyOAuth(
                 scope="playlist-modify-private",
@@ -38,7 +27,8 @@ def get_global_spotify_client():
                 client_secret=os.getenv("CLIENT_SECRET"),
                 show_dialog=True,
                 cache_path="token.txt",
-            )
+            ),
+            **kwargs,
         )
     return sp
 
@@ -82,12 +72,11 @@ def create_playlist(
         # Create Spotify client with user's access token
         logging.info(f"Creating Spotify client with token: {access_token[:20]}...")
 
-        # Create a custom session that handles SSL properly
-        session = requests.Session()
-        session.verify = False  # Disable SSL verification
-
-        # Use the correct Spotipy authentication method with custom session
-        user_sp = spotipy.Spotify(auth=access_token, requests_session=session)
+        session = get_requests_session_for_outbound()
+        kwargs = {}
+        if session is not None:
+            kwargs["requests_session"] = session
+        user_sp = spotipy.Spotify(auth=access_token, **kwargs)
         logging.info("Spotify client created successfully")
 
         # Test the authentication by getting current user

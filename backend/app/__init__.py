@@ -12,6 +12,12 @@ def create_app():
     uri = os.environ.get("DATABASE_URL")
     if uri and uri.startswith("postgres://"):
         uri = uri.replace("postgres://", "postgresql://", 1)
+    env = (os.environ.get("FLASK_ENV") or os.environ.get("APP_ENV") or "").strip().lower()
+    if env == "production" and not uri:
+        raise RuntimeError(
+            "Production requires DATABASE_URL (e.g. Heroku Postgres). "
+            "Do not use sqlite in production."
+        )
     app.config["SQLALCHEMY_DATABASE_URI"] = uri or "sqlite:///chart_cache.db"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db.init_app(app)
