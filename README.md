@@ -1,127 +1,220 @@
-# Rewindify 🎵
+# Rewindify
 
-**Turn back time and relive the hits!**
+Rewindify is a web application that allows you to create Spotify playlists based on Billboard Hot 100 chart data from any date. The app scrapes Billboard charts and matches songs to Spotify tracks, then creates a personalized playlist in your Spotify account.
 
-Rewindify is a web application that lets you create custom Spotify playlists based on Billboard Hot 100 charts from any date. Relive the music that defined a moment in time and discover what was topping the charts on birthdays, anniversaries, or any memorable date.
+## Project Structure
 
-## What It Does
+- **Frontend**: React application (runs on port 3000)
+- **Backend**: Flask API server (runs on port 5000)
 
-Rewindify bridges the gap between Billboard chart history and your Spotify library. Simply select a date, choose how many tracks you want, and Rewindify will:
+## Prerequisites
 
-1. Fetch the Billboard Hot 100 chart data for that date
-2. Match each song to its Spotify equivalent
-3. Let you preview the tracks and customize your selection
-4. Create a personalized playlist directly in your Spotify account
+Before running the application, make sure you have:
 
-## Features
+1. **Node.js** (v14 or higher) and **npm** installed
+2. **Python** (3.7 or higher) installed
+3. **Spotify Developer Account** credentials (already configured in `.env` files)
 
-- 📅 **Time Travel Through Music**: Browse Billboard Hot 100 charts from any historical date
-- 🎧 **Spotify Integration**: Seamlessly create playlists in your Spotify account
-- ✅ **Track Selection**: Preview and select which songs to include in your playlist
-- 🎨 **Custom Playlists**: Name your playlist and make it uniquely yours
-- 🔒 **Privacy-Focused**: No personal data is collected or stored; only necessary Spotify permissions are used
+## Setup Instructions
 
-## Tech Stack
-
-### Frontend
-- React 18
-- React Router for navigation
-- Axios for API calls
-- Create React App
-
-### Backend
-- Python Flask
-- BeautifulSoup4 for web scraping
-- Spotipy (Spotify Web API wrapper)
-- Flask-CORS for cross-origin requests
-
-## Installation
-
-### Prerequisites
-- Node.js and npm
-- Python 3.x
-- A Spotify Developer account
-
-### Backend Setup
+### 1. Backend Setup
 
 1. Navigate to the backend directory:
    ```bash
    cd backend
    ```
 
-2. Install Python dependencies:
+2. Create a virtual environment (recommended):
+   ```bash
+   python -m venv venv
+   ```
+
+3. Activate the virtual environment:
+   - **Windows (PowerShell)**:
+     ```powershell
+     .\venv\Scripts\Activate.ps1
+     ```
+   - **Windows (Command Prompt)**:
+     ```cmd
+     venv\Scripts\activate.bat
+     ```
+   - **macOS/Linux**:
+     ```bash
+     source venv/bin/activate
+     ```
+
+4. Install Python dependencies:
+   ```bash
+   pip install flask flask-cors spotipy python-dotenv requests beautifulsoup4 urllib3
+   ```
+
+   Or if you prefer to use a requirements file, create `requirements.txt` with:
+   ```
+   flask
+   flask-cors
+   spotipy
+   python-dotenv
+   requests
+   beautifulsoup4
+   urllib3
+   ```
+   Then run:
    ```bash
    pip install -r requirements.txt
    ```
 
-3. Create a `.env` file in the backend directory with your Spotify credentials:
+5. Verify the `.env` file exists in the `backend` directory with:
    ```
-   CLIENT_ID=your_spotify_client_id
-   CLIENT_SECRET=your_spotify_client_secret
-   REDIRECT_URI=your_redirect_uri
-   ```
-
-4. Run the Flask server:
-   ```bash
-   python run.py
+   CLIENT_ID="your_spotify_client_id"
+   CLIENT_SECRET="your_spotify_client_secret"
+   REDIRECT_URI=http://localhost:3000
    ```
 
-### Frontend Setup
+### 2. Frontend Setup
 
 1. Navigate to the frontend directory:
    ```bash
    cd frontend
    ```
 
-2. Install dependencies:
+2. Install Node.js dependencies:
    ```bash
    npm install
    ```
 
-3. Start the development server:
-   ```bash
-   npm start
+3. Verify the `.env` file exists in the `frontend` directory with:
+   ```
+   REACT_APP_SPOTIFY_CLIENT_ID="your_spotify_client_id"
+   REACT_APP_API_URL=http://localhost:3000
    ```
 
-The application will open at `http://localhost:3000`.
+## Running the Application
+
+You need to run both the backend and frontend servers simultaneously.
+
+### Option 1: Run in Separate Terminals
+
+**Terminal 1 - Backend:**
+```bash
+cd backend
+python run.py
+```
+The backend will start on `http://localhost:5000`
+
+**Terminal 2 - Frontend:**
+```bash
+cd frontend
+npm start
+```
+The frontend will start on `http://localhost:3000` and automatically open in your browser.
+
+### Option 2: Run in Background (Windows PowerShell)
+
+**Backend (background):**
+```powershell
+cd backend
+Start-Process python -ArgumentList "run.py" -WindowStyle Hidden
+```
+
+**Frontend:**
+```powershell
+cd frontend
+npm start
+```
 
 ## Usage
 
-1. **Select a Date**: Choose any date from Billboard's Hot 100 chart history
-2. **Choose Track Count**: Decide how many songs you want (up to 100)
-3. **Generate Chart**: Click "Generate" to fetch the Billboard data
-4. **Preview Songs**: Review the list of tracks that will be included
-5. **Login to Spotify**: Authenticate with your Spotify account (only needed for playlist creation)
-6. **Create Playlist**: Click "Create Playlist" to add it to your Spotify library
-7. **Enjoy**: Open the playlist in Spotify and enjoy your musical time capsule!
+1. Open your browser and navigate to `http://localhost:3000`
+2. Click "Login with Spotify" to authenticate your Spotify account
+3. Select a date from the Billboard Hot 100 charts
+4. Choose the number of tracks (up to 100)
+5. Click "Generate Playlist" to fetch songs from that date
+6. Review and select songs you want in your playlist
+7. Optionally customize the playlist name
+8. Click "Create Playlist" to add it to your Spotify account
 
-## How It Works
+## API Endpoints
 
-Rewindify uses web scraping to retrieve historical Billboard Hot 100 chart data, then leverages the Spotify Web API to:
-- Search for matching tracks on Spotify
-- Create a new private playlist in your account
-- Add the matched tracks to your playlist
+The backend provides the following API endpoints:
 
-Some older or niche tracks might not be available on Spotify or may be listed under alternate titles. The app does its best to match each song as accurately as possible.
+- `GET /api/health` - Health check (returns 200 and verifies DB); use for deployment/load balancers
+- `GET /api/scrape?date=YYYY-MM-DD&limit=100&enrich=true` - Scrape Billboard chart data
+- `GET /api/recent-charts` - Get most popular chart dates
+- `POST /api/test-auth` - Test Spotify authentication
+- `POST /api/create-playlist` - Create a Spotify playlist
 
-## Privacy
+## Troubleshooting
 
-Rewindify only requests the minimum Spotify permissions necessary to create playlists on your behalf. No personal data is collected or stored. See the [Privacy Policy](frontend/src/pages/PrivacyPolicy.jsx) for more details.
+### Backend Issues
 
-## Credits
+- **Port 5000 already in use**: Change the port in `backend/run.py` or stop the process using port 5000
+- **SSL Certificate errors**: Outbound requests use full SSL verification by default. In production, never disable it. For local development behind a corporate proxy, you can set `DISABLE_SSL_VERIFY=1` only when `FLASK_ENV=development` (see `backend/.env.example`). Otherwise, fix certificate issues with proper system/CA configuration (e.g. install your proxy’s CA bundle).
+- **Module not found errors**: Ensure all dependencies are installed in your virtual environment
 
-Created by [Andrew Sliva](https://github.com/ajs2583)
+### Frontend Issues
 
-Inspired by [Receiptify](https://receiptify.herokuapp.com/index.html)
+- **Port 3000 already in use**: The React dev server will prompt you to use a different port
+- **API connection errors**: Ensure the backend is running on port 5000
+- **Spotify authentication fails**: Verify your `.env` file has the correct Spotify credentials
+
+### General Issues
+
+- **CORS errors**: The backend has CORS enabled, but if you encounter issues, check that the frontend proxy is configured correctly in `frontend/src/setupProxy.js`
+- **Songs not found**: Some older Billboard charts may have incomplete data or songs may not be available on Spotify
+
+## Deployment (Heroku)
+
+### Config vars (Heroku)
+
+- **DATABASE_URL** – Set automatically when you add Heroku Postgres. Production must set this; sqlite is for local dev only.
+- **PORT** – Set automatically by Heroku.
+- **CLIENT_ID**, **CLIENT_SECRET**, **REDIRECT_URI** – Your Spotify app credentials. Set **REDIRECT_URI** to your production URL (e.g. `https://yourapp.herokuapp.com`) and add that URL to your Spotify app’s redirect URIs in the Spotify Developer Dashboard.
+
+Do **not** set `DISABLE_SSL_VERIFY` in production; outbound HTTPS uses full certificate verification.
+
+### Runtime behavior
+
+The **Procfile** runs `gunicorn -b 0.0.0.0:$PORT run:app`. When the `backend/static_ui/` directory is present (React build), the app serves the SPA from `/` and the API from `/api`. All `/api` routes take precedence; the SPA is served for other paths so the same app can be used for both API and UI.
+
+### Single-app deploy (backend serves frontend)
+
+1. Build the frontend: `cd frontend && npm run build`
+2. Copy the build into the backend: copy contents of `frontend/build/` into `backend/static_ui/` (so `backend/static_ui/index.html` and `backend/static_ui/static/` exist).
+3. Deploy the repo; the Procfile runs the backend. The app will serve the React SPA from `/` when `static_ui` is present.
+
+### Two-app deploy (frontend elsewhere)
+
+Deploy the backend to Heroku as above (without `static_ui`). Deploy the frontend to Vercel/Netlify (or similar) and set:
+
+- **REACT_APP_API_URL** = your Heroku backend URL (e.g. `https://yourapp.herokuapp.com`)
+- **REACT_APP_REDIRECT_URI** = your frontend URL (e.g. `https://yourapp.vercel.app`)
+
+Add the frontend URL as a redirect URI in your Spotify app.
+
+### Playlist creation and SSL
+
+The `POST /api/create-playlist` request/response contract is unchanged. Playlist creation in production uses full SSL verification when talking to Spotify. Do not set `DISABLE_SSL_VERIFY` in production. If you see SSL/certificate errors, fix system or CA configuration rather than disabling verification.
+
+**After deployment, verify playlist creation:** log in with Spotify, pick a chart date, generate the playlist, create it, and open the returned playlist link in Spotify to confirm it was created and contains tracks.
+
+## Daily chart refresh (Heroku Scheduler)
+
+Chart data is cached in the database. Production must set **DATABASE_URL** (e.g. Heroku Postgres); sqlite is for local dev only. To keep caches fresh (e.g. if Billboard changes the site), run a daily scrape. The job is idempotent and safe to run daily.
+
+1. Add the **Heroku Scheduler** add-on to your app.
+2. In Scheduler, add a job that runs **daily** with:
+   ```bash
+   cd backend && flask scrape-daily
+   ```
+   (Ensure the app’s run directory is the project root so `backend` exists, or run `flask scrape-daily` from the `backend` directory if that is the app root.)
+3. The command refreshes up to 50 cached chart dates (oldest first) plus the current chart week. It exits with a non-zero code if any date failed so you can alert on job failure.
+
+## Development
+
+- Frontend code is in `frontend/src/`
+- Backend code is in `backend/app/`
+- The frontend uses a proxy to forward `/api` requests to the backend (configured in `frontend/src/setupProxy.js`)
 
 ## License
 
-This project is dual-licensed under the MIT and Apache 2.0 licenses. See [LICENSE-MIT](LICENSE-MIT) and [LICENSE-APACHE](LICENSE-APACHE) for details.
-
-## Contributing
-
-Contributions are welcome! Feel free to open issues or submit pull requests.
-
----
-
-Made with ❤️ for music lovers who want to rediscover the soundtrack of the past.
+MIT License - see LICENSE file for details

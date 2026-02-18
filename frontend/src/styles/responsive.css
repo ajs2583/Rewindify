@@ -20,6 +20,59 @@
 		font-size: 16px;
 		max-width: 90%;
 	}
+
+	/* About page responsive */
+	.about-content {
+		padding: 25px;
+	}
+
+	.steps-container {
+		grid-template-columns: 1fr;
+		gap: 20px;
+	}
+
+	.step {
+		flex-direction: column;
+		text-align: center;
+		gap: 10px;
+	}
+
+	.step-number {
+		align-self: center;
+	}
+
+	.about-section h2 {
+		font-size: 1.5rem;
+	}
+
+	/* Home page responsive */
+	.home-hero {
+		padding: 40px 15px;
+	}
+
+	.hero-features {
+		gap: 15px;
+	}
+
+	.feature-item {
+		padding: 10px 15px;
+		font-size: 0.9rem;
+	}
+
+	.form-section,
+	.charts-section {
+		padding: 25px;
+	}
+
+	.songs-section {
+		padding: 25px;
+		margin-top: 0;
+	}
+
+	.charts-section-secondary {
+		margin-top: 30px;
+		padding: 18px 20px;
+	}
 }
 
 /* Small screens (phones) */
@@ -47,5 +100,153 @@
 	.song-table td {
 		padding: 10px 12px;
 		font-size: 13px;
+	}
+
+	/* About page mobile */
+	.about-page {
+		padding: 20px 10px;
+	}
+
+	.about-content {
+		padding: 20px;
+		border-radius: 10px;
+	}
+
+	.about-title {
+		font-size: 1.8rem;
+		margin-bottom: 20px;
+	}
+
+	.about-description {
+		font-size: 1rem;
+	}
+
+	.about-section h2 {
+		font-size: 1.3rem;
+		margin-bottom: 20px;
+	}
+
+	.step {
+		padding: 15px;
+		gap: 10px;
+	}
+
+	.step-number {
+		width: 35px;
+		height: 35px;
+		font-size: 1rem;
+	}
+
+	.step-content h3 {
+		font-size: 1.1rem;
+	}
+
+	.step-content p {
+		font-size: 0.9rem;
+	}
+
+	.faq-item {
+		padding: 15px;
+	}
+
+	.faq-item h3 {
+		font-size: 1.1rem;
+	}
+
+	.faq-item p {
+		font-size: 0.9rem;
+	}
+
+	/* Footer mobile */
+	.about-footer,
+	.contact-footer,
+	.privacy-footer {
+		padding: 15px 10px;
+	}
+
+	.footer-links {
+		font-size: 0.9rem;
+		line-height: 1.8;
+	}
+
+	.personal-website-button {
+		font-size: 0.85rem;
+		padding: 8px 16px;
+		width: 100%;
+		max-width: 280px;
+	}
+
+	/* Home page mobile */
+	.home-hero {
+		padding: 30px 10px;
+	}
+
+	.home-title {
+		font-size: 2.2rem;
+		margin-bottom: 15px;
+	}
+
+	.home-subtitle {
+		font-size: 1rem;
+		margin-bottom: 20px;
+	}
+
+	.hero-features {
+		flex-direction: column;
+		align-items: center;
+		gap: 10px;
+		margin-top: 20px;
+	}
+
+	.feature-item {
+		width: 100%;
+		max-width: 250px;
+		justify-content: center;
+		padding: 12px 20px;
+	}
+
+	.home-content {
+		padding: 20px 10px;
+	}
+
+	.form-section,
+	.charts-section {
+		padding: 20px;
+		border-radius: 10px;
+	}
+
+	.songs-section {
+		padding: 20px;
+		margin-top: 0;
+		border-radius: 10px;
+	}
+
+	.charts-section-secondary {
+		margin-top: 20px;
+		padding: 16px 18px;
+	}
+
+	/* Recent charts mobile */
+	.chart-item {
+		padding: 12px;
+		gap: 10px;
+	}
+
+	.chart-rank {
+		width: 25px;
+		height: 25px;
+		font-size: 0.8rem;
+	}
+
+	.chart-date {
+		font-size: 0.9rem;
+	}
+
+	.chart-year {
+		font-size: 0.8rem;
+	}
+
+	.chart-count {
+		font-size: 0.7rem;
 	}
 }
